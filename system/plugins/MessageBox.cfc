@@ -1,4 +1,4 @@
-﻿<!-----------------------------------------------------------------------
+<!-----------------------------------------------------------------------
 ********************************************************************************
 Copyright Since 2005 ColdBox Framework by Luis Majano and Ortus Solutions, Corp
 www.coldbox.org | www.luismajano.com | www.ortussolutions.com
@@ -89,7 +89,7 @@ Description :
 			var msg = structnew();
 
 			// check message type
-			if( isValidMessageType(arguments.type) ){
+			if( refindnocase("(error|warning|info)", trim(arguments.type)) ){
 				// Populate message
 				msg.type 	= arguments.type;
 				msg.message = arguments.message;
@@ -119,7 +119,7 @@ Description :
 			var newMessage = "";
 
 			// Do we have a message?
-			if( isEmpty() ){
+			if( isEmptyMessage() ){
 				// Set default message
 				setMessage('info',arguments.message);
 			}
@@ -144,7 +144,7 @@ Description :
 			var newMessage = "";
 
 			// Do we have a message?
-			if( isEmpty() ){
+			if( isEmptyMessage() ){
 				// Set default message
 				setMessage(type='info',messageArray=arguments.messageArray);
 			}
@@ -169,7 +169,7 @@ Description :
 			var newMessage = "";
 
 			// Do we have a message?
-			if( isEmpty() ){
+			if( isEmptyMessage() ){
 				// Set default message
 				setMessage(type='info',messageArray=arguments.messageArray);
 			}
@@ -210,7 +210,7 @@ Description :
 	</cffunction>
 
 	<!--- Is Empty --->
-	<cffunction name="isEmpty" access="public" hint="Checks wether the MessageBox is empty or not." returntype="boolean" output="false">
+	<cffunction name="isEmptyMessage" access="public" hint="Checks wether the MessageBox is empty or not." returntype="boolean" output="false">
 		<cfscript>
 			var msgStruct = getMessage();
 
@@ -235,12 +235,11 @@ Description :
 		<cfargument name="value" type="string" required="true">
 		<cfscript>
 			var data = arrayNew(1);
-			var tempStruct = {key = arguments.key, value = arguments.value};
 			// Check flash
 			if( flash.exists(instance.flashDataKey) ){
 				data = flash.get(instance.flashDataKey);
 			}
-			arrayAppend(data, tempStruct);
+			arrayAppend(data, {key = arguments.key, value = arguments.value});
 			// Flash it
 			flash.put(name=instance.flashDataKey,value=data,inflateToRC=false,saveNow=true,autoPurge=false);
 		</cfscript>
@@ -306,7 +305,7 @@ Description :
 		<cfset var results = "">
 
 		<!--- Verify Message Type --->
-		<cfif isValidMessageType(arguments.type)>
+		<cfif refindnocase("(error|warning|info)", trim(arguments.type))>
 			<!--- Populate message struct --->
 			<cfset msgStruct.type = arguments.type>
 			<cfset msgStruct.message = arguments.message>
@@ -325,11 +324,6 @@ Description :
 	</cffunction>
 
 <!------------------------------------------- PRIVATE ------------------------------------------>
-
-    <cffunction name="isValidMessageType" access="private" output="false" returntype="string" hint="Returns a list of valid message types.">
-	<cfargument name="type" type="string" required="true" />
-	<cfreturn refindnocase("(error|warning|info)", trim(arguments.type)) /> 
-    </cffunction>
 
 	<!--- flattenMessageArray --->
     <cffunction name="flattenMessageArray" output="false" access="private" returntype="any">
